@@ -10,10 +10,12 @@ const isEdge = msedge > 0;
 
 export const MsalContext = React.createContext();
 export const useMsal = () => useContext(MsalContext);
-export const MsalProvider = ({
-    children,
-    config
-}) => {
+
+export function MsalProvider(props) {
+    const {
+        children,
+        config
+    } = props;
     const [isAuthenticated, setIsAuthenticated] = useState();
     const [user, setUser] = useState();
     const [token, setToken] = useState();
@@ -22,34 +24,34 @@ export const MsalProvider = ({
     const [popupOpen, setPopupOpen] = useState(false);
     const [loginError, setLoginError] = useState(false);
 
-    useEffect(() => {
+    useEffect(UseEffect, []);
+
+    function UseEffect() {
 
         const pc = new msal.PublicClientApplication(config);
         setPublicClient(pc);
 
-        pc.handleRedirectPromise().then((response) => 
-        {
+        pc.handleRedirectPromise().then((response) => {
             setLoading(false);
             if (response) {
                 setUser(pc.getAccount());
                 setIsAuthenticated(true);
-                if(response.accessToken) {
-                  setToken(response.accessToken);
+                if (response.accessToken) {
+                    setToken(response.accessToken);
                 }
-            } 
+            }
         }).catch(error => {
             console.log(error);
             setLoginError(error);
         });
 
-        if (pc.getAccount()) {
+        if (pc.getAccount && pc.getAccount()) {
             setUser(pc.getAccount());
             setIsAuthenticated(true);
         }
-        // eslint-disable-next-line
-    }, []);
+    }
 
-    const login = async (loginRequest, method) => {
+    async function login(loginRequest, method) {
         const signInType = (isIE || isEdge) ? "loginRedirect" : method;
         if (signInType === "loginPopup") {
             setPopupOpen(true);
@@ -74,57 +76,52 @@ export const MsalProvider = ({
         }
     }
 
-    const logout = () => {
+    function logout() {
         publicClient.logout();
     }
 
-    const getTokenPopup = async (loginRequest) => {
+    async function getTokenPopup(loginRequest) {
         try {
             const response = await publicClient.acquireTokenSilent(loginRequest);
             setToken(response.accessToken);
         } catch (error) {
             try {
                 setPopupOpen(true);
-                
+
                 const response = await publicClient.acquireTokenPopup(loginRequest);
 
                 setToken(response.accessToken);
-            }
-            catch (error) {
+            } catch (error) {
                 console.log(error);
                 setLoginError(error);
-            }
-            finally {
+            } finally {
                 setPopupOpen(false);
             }
         }
     }
 
-    // This function can be removed if you do not need to support IE
-    const getTokenRedirect = async (loginRequest) => {
+// This function can be removed if you do not need to support IE
+    async function getTokenRedirect(loginRequest) {
         try {
             setToken(await publicClient.acquireTokenSilent(loginRequest));
-        }
-        catch(error) {
-               
-            try{
+        } catch (error) {
+
+            try {
                 setLoading(true);
-                
+
                 publicClient.acquireTokenRedirect(loginRequest);
-            }
-            catch(error) { 
+            } catch (error) {
                 console.log(error);
                 setLoginError(error);
             }
         }
     }
 
-    const getToken = async (loginRequest, method) => {
-        const signInType = (isIE || isEdge)? "loginRedirect" : method;
-        if(signInType === "loginRedirect") {
+    async function getToken(loginRequest, method) {
+        const signInType = (isIE || isEdge) ? "loginRedirect" : method;
+        if (signInType === "loginRedirect") {
             return await getTokenRedirect(loginRequest);
-        } else
-        {
+        } else {
             return await getTokenPopup(loginRequest);
         }
     }
@@ -146,4 +143,4 @@ export const MsalProvider = ({
             {children}
         </MsalContext.Provider>
     );
-};
+}

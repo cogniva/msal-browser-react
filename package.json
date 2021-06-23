@@ -3,19 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@azure/msal-browser": "^2.0.0-beta.2",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
+    "@azure/msal-browser": "^2.0.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1"
+    "react-scripts": "3.4.1",
+    "cross-env": "^5.2.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "cross-env HTTPS=true SSL_CRT_FILE=localhost+2.pem SSL_KEY_FILE=localhost+2-key.pem react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "devcert": "mkcert -install && mkcert localhost 127.0.0.1 ::1"
   },
   "eslintConfig": {
     "extends": "react-app"

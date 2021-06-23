@@ -1,5 +1,4 @@
 import React from 'react';
-import './App.css';
 import Welcome from "./Welcome";
 
 import { useMsal } from "./msal-context";
